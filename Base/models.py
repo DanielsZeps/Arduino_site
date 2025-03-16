@@ -7,6 +7,7 @@ class Sensor_Reading(models.Model):
     temperature = models.FloatField(null=True)
     humidity = models.FloatField(null=True)
     lux = models.FloatField(null=True)
+    time = models.DateTimeField(null=True)
 
 class Sensor_ID(models.Model):
     sensor_id = models.CharField(default=0, max_length=128)

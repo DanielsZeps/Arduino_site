@@ -21,5 +21,6 @@ from . import views
 
 urlpatterns = [
     path('', views.main, name='main'),
+    path('sensor_data', views.sensor_data, name='sensor_data'),
     path('sensor/<str:pk>/<str:lux>/<str:temperature>/<str:humidity>', views.sensor, name='sensor'),
 ]

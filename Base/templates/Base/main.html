@@ -1,6 +1,82 @@
-{% for sensor in sensors %}
-    <h1>{{sensor.sensor_id}}, {{sensor.latitude}}, {{sensor.longitude}}</h1>
-    {% for data in sensor.readings.all %}
-        <p>{{data.lux}}, {{data.temperature}}, {{data.humidity}}</p>
-    {% endfor %}
-{% endfor %}
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+            crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            #map {
+                height: 100vh;
+                width: 100vw;
+            }
+        </style>
+        <script></script>
+    </head>
+    <body>
+        <div id="map"></div>
+    </body>
+    <script>
+        var map;
+        var marker;
+        var markers;
+        var markersCluster;
+
+        function createMap() {
+            var mapOptions = {
+                center:  [56.947561, 24.099315],
+                zoom: 8,
+                gestureHandling: true,
+                minZoom: 6,
+                maxZoom: 18, 
+            }
+
+            map = new L.map("map", mapOptions);
+            markers = new L.layerGroup();
+
+            var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+            map.addLayer(layer);
+
+            try {
+                marker = L.marker([document.getElementById('lat').value, document.getElementById('lng').value]);
+                marker.addTo(map);
+            } catch { }
+            map.addLayer(markers);
+        }
+        function update_data() {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    val = JSON.parse(this.responseText)["data"];
+                    markers.clearLayers();
+                    
+                    for (var x = 0; x < val.length; x++) {
+                        marker = L.marker([
+                            val[x]["lat"],
+                            val[x]["lng"]
+                        ]);
+                        marker.addTo(markers).bindPopup(
+                            "Sensors: " + val[x]["sensor"] + "<br>" +
+                            "Lux: " + val[x]["lux"] + "<br>" +
+                            "Temperatūra: " + val[x]["temp"] + "<br>" +
+                            "Gaisa mitrums: " + val[x]["hum"] + "<br>" +
+                            "Datums: " + val[x]["time"]
+                        );
+                    }
+                }
+            }
+            xhttp.open("GET", `/sensor_data`);
+            xhttp.send();
+        }
+        createMap();
+        update_data();
+        setInterval(update_data, 30000);
+    </script>
+</html>
