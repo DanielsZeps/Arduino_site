@@ -46,14 +46,17 @@ def sensor_data(request):
         "data": []
     }
     for x in Sensor_ID.objects.all():
-        data = x.readings.last()
-        response["data"].append({
-            "sensor": x.sensor_id,
-            "lat": x.latitude,
-            "lng": x.longitude,
-            "lux": data.lux,
-            "temp": data.temperature,
-            "hum": data.humidity,
-            "time": data.time,
-        })
+        try:
+            data = x.readings.last()
+            response["data"].append({
+                "sensor": x.sensor_id,
+                "lat": x.latitude,
+                "lng": x.longitude,
+                "lux": data.lux,
+                "temp": data.temperature,
+                "hum": data.humidity,
+                "time": data.time,
+            })
+        except:
+            pass
     return JsonResponse(response)
