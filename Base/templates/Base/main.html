@@ -1,0 +1,6 @@
+{% for sensor in sensors %}
+    <h1>{{sensor.sensor_id}}, {{sensor.latitude}}, {{sensor.longitude}}</h1>
+    {% for data in sensor.readings.all %}
+        <p>{{data.lux}}, {{data.temperature}}, {{data.humidity}}</p>
+    {% endfor %}
+{% endfor %}
