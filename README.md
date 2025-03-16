@@ -4,8 +4,7 @@
 
 <h3>Arduino kods</h3>
 
-<p>
-<pre>#include "DHT.h"
+<p><pre>#include "DHT.h"
 #include <<!-- Tag stopper -->WiFi.h>
 #include <<!-- Tag stopper -->HTTPClient.h>
 
@@ -25,7 +24,7 @@ const int R1 = 10000;
 // LV: Gulēšanas laiks sekundēs
 // ENG: Sleeping time in seconds
 #define uS_TO_S_FACTOR 1000000
-#define TIME_TO_SLEEP  300
+#define TIME_TO_SLEEP  60
 
 // LV: Arduino kontroliera WiFi savienojuma nosaukums un parole
 // ENG: Arduino controller WiFi connection name and password
@@ -37,6 +36,7 @@ const char* password = "Silver123";
 String ID = "Sensors_nr_1001: Rēzekne";
 
 void setup(){
+  Serial.begin(115200);
   // LV: Atļautie WiFi savienojuma mēģinājumi
   // ENG: Allowed WiFi connection try ammount
   int wif_connection_tries_left = 20;
@@ -46,31 +46,33 @@ void setup(){
     delay(500);
     wif_connection_tries_left -= 1;
   }
-  if (wif_connection_tries_left > 0) {
-    if(WiFi.status()== WL_CONNECTED){
-      HTTPClient http;
+  if(WiFi.status()== WL_CONNECTED && wif_connection_tries_left > 0){
+    HTTPClient http;
 
-      pinMode(ldrPin, INPUT);
-      dht.begin();
-      analogReadResolution(12);  
-      analogSetAttenuation(ADC_11db);
+    pinMode(ldrPin, INPUT);
+    dht.begin();
+    analogReadResolution(12);  
+    analogSetAttenuation(ADC_11db);
 
-      float h = dht.readHumidity();
-      float t = dht.readTemperature();
-      int analogValue = analogRead(ldrPin);
-      float lux = NAN;
-      if (analogValue != 0) {
-        float voltage = analogValue / 4095.0 * 3.3;
-        float resistance = R1 * voltage / (3.3 - voltage); // Corrected formula
-        float lux = pow(RL10 * 1e3 * pow(10, GAMMA) / resistance, (1 / GAMMA)) * 3.70233246946;
-      }
-      String serverPath = "https://daniels0zeps.eu.pythonanywhere.com/sensor/" + ID + "/" + String(lux) + "/" + String(t) + "/" + String(h);
-
-      http.begin(serverPath);
-      int httpResponseCode = http.GET();
-      
-      http.end();
+    float h = dht.readHumidity();
+    float t = dht.readTemperature();
+    int analogValue = analogRead(ldrPin);
+    float lux = NAN;
+    if (analogValue != 0) {
+      float voltage = analogValue / 4095.0 * 3.3;
+      float resistance = R1 * voltage / (3.3 - voltage); // Corrected formula
+      float lux = pow(RL10 * 1e3 * pow(10, GAMMA) / resistance, (1 / GAMMA)) * 3.70233246946;
     }
+    String serverPath = "https://daniels0zeps.eu.pythonanywhere.com/sensor/" + ID + "/" + String(lux) + "/" + String(t) + "/" + String(h);
+
+    Serial.println(serverPath);
+
+    http.begin(serverPath);
+    int httpResponseCode = http.GET();
+    
+    http.end();
+  } else {
+    Serial.println("Not sent");
   }
 
   // LV: Ieslēd dziļās gulēšanas režīmu
@@ -80,5 +82,4 @@ void setup(){
   esp_deep_sleep_start();
 }
 
-void loop(){}</pre>
-<p>
+void loop(){}</pre><p>
