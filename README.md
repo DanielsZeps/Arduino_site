@@ -6,8 +6,8 @@
 
 <p>
 <pre>#include "DHT.h"
-#include <WiFi.h>
-#include <HTTPClient.h>
+#include <<!-- Tag stopper -->WiFi.h>
+#include <<!-- Tag stopper -->HTTPClient.h>
 
 // LV: DHT sensora parametri
 // ENG: DHT sensr parameters
